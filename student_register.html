@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Register — Student Event System | ADBU</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #0a1628;
+    --gold: #c9a84c;
+    --text-light: #e8e4dc;
+    --text-muted: #8a9ab5;
+    --card-bg: rgba(17, 34, 68, 0.85);
+    --border: rgba(201, 168, 76, 0.25);
+    --input-bg: rgba(255,255,255,0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Background */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 80%, rgba(10,60,120,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, rgba(10,40,100,0.3) 0%, transparent 60%),
+      linear-gradient(160deg, #0a1628 0%, #0d1e3a 50%, #091220 100%);
+  }
+
+  .bg-lines {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bg-lines::before {
+    content: '';
+    position: absolute;
+    bottom: -10%; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 700px;
+    border: 1px solid rgba(201,168,76,0.07);
+    border-radius: 50%;
+    animation: pulse-ring 9s ease-in-out infinite;
+  }
+  .bg-lines::after {
+    content: '';
+    position: absolute;
+    bottom: -5%; left: 50%;
+    transform: translateX(-50%);
+    width: 520px; height: 520px;
+    border: 1px solid rgba(201,168,76,0.05);
+    border-radius: 50%;
+    animation: pulse-ring 9s ease-in-out infinite 2s;
+  }
+  @keyframes pulse-ring {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+    50% { transform: translateX(-50%) scale(1.05); opacity: 1; }
+  }
+
+  .dot-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: radial-gradient(circle, rgba(201,168,76,0.12) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+    animation: grid-drift 20s linear infinite;
+  }
+  @keyframes grid-drift {
+    0% { background-position: 0 0; }
+    100% { background-position: 36px 36px; }
+  }
+
+  /* Wrapper */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    padding: 20px;
+    animation: fade-up 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Card */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 36px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04) inset,
+      0 32px 80px rgba(0,0,0,0.5),
+      0 0 60px rgba(201,168,76,0.04);
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .logo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .logo-wrap img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(201,168,76,0.2));
+    animation: logo-glow 4s ease-in-out infinite;
+  }
+  @keyframes logo-glow {
+    0%, 100% { filter: drop-shadow(0 4px 12px rgba(201,168,76,0.15)); }
+    50%       { filter: drop-shadow(0 4px 20px rgba(201,168,76,0.35)); }
+  }
+
+  .uni-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-diamond {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    opacity: 0.6;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Fields */
+  .field {
+    margin-bottom: 14px;
+    position: relative;
+    animation: fade-up 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .field:nth-child(1) { animation-delay: 0.12s; }
+  .field:nth-child(2) { animation-delay: 0.20s; }
+  .field:nth-child(3) { animation-delay: 0.28s; }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    background: var(--input-bg);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+  }
+  .field input::placeholder { color: rgba(255,255,255,0.2); }
+  .field input:focus {
+    border-color: rgba(201,168,76,0.5);
+    background: rgba(201,168,76,0.04);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+  }
+
+  .field-icon {
+    position: absolute;
+    left: 14px;
+    bottom: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: color 0.25s;
+  }
+  .field input:focus ~ .field-icon { color: var(--gold); }
+
+  .eye-toggle {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+  .eye-toggle:hover { color: var(--gold); }
+
+  /* Error */
+  .error-msg {
+    font-size: 12px;
+    color: #ff6b6b;
+    margin-bottom: 12px;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .error-msg.visible { opacity: 1; transform: translateY(0); }
+
+  /* Success */
+  .success-msg {
+    font-size: 12px;
+    color: #4ade80;
+    margin-bottom: 12px;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .success-msg.visible { opacity: 1; transform: translateY(0); }
+
+  /* Register button */
+  .btn-register {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--gold) 0%, #a87c2a 100%);
+    color: #0a1628;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.25s;
+    margin-top: 4px;
+    animation: fade-up 0.6s cubic-bezier(0.22,1,0.36,1) 0.35s both;
+  }
+  .btn-register::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn-register:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+  .btn-register:hover::before { opacity: 1; }
+  .btn-register:active { transform: translateY(0); }
+  .btn-register.loading { opacity: 0.7; pointer-events: none; }
+
+  /* Footer row */
+  .footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 22px;
+    animation: fade-up 0.6s cubic-bezier(0.22,1,0.36,1) 0.45s both;
+  }
+
+  .btn-theme {
+    background: #c9a84c;
+    border: none;
+    border-radius: 20px;
+    color: #0a1628;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .btn-theme:hover { background: #e8c97a; }
+
+  .login-link {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+  .login-link a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .login-link a:hover { opacity: 0.75; text-decoration: underline; }
+
+  /* Light mode */
+  body.light {
+    --navy: #f0ece3;
+    --card-bg: rgba(255,252,245,0.92);
+    --text-light: #1a1a2e;
+    --text-muted: #6b7280;
+    --border: rgba(201,168,76,0.3);
+    --input-bg: rgba(0,0,0,0.04);
+  }
+  body.light .dot-grid {
+    background-image: radial-gradient(circle, rgba(10,22,40,0.08) 1px, transparent 1px);
+  }
+  body.light .bg-layer {
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,168,76,0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 80%, rgba(200,220,255,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, rgba(200,220,255,0.2) 0%, transparent 60%),
+      linear-gradient(160deg, #f0ece3 0%, #e8e2d4 50%, #f4f0e8 100%);
+  }
+  body.light .field input { color: #1a1a2e; border-color: rgba(0,0,0,0.12); }
+  body.light .field input::placeholder { color: rgba(0,0,0,0.2); }
+  body.light .page-title { color: #1a1a2e; }
+  body.light .bg-lines::before,
+  body.light .bg-lines::after { border-color: rgba(10,22,40,0.06); }
+</style>
+</head>
+
+<body>
+
+<div class="bg-layer"></div>
+<div class="bg-lines"></div>
+<div class="dot-grid"></div>
+
+<div class="wrapper">
+  <div class="card">
+
+    <div class="header">
+      <div class="logo-wrap">
+        <img src="download.png" alt="Assam Don Bosco University Logo">
+      </div>
+      <div class="uni-name">Assam Don Bosco University</div>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-diamond"></div>
+        <div class="divider-line"></div>
+      </div>
+      <div class="page-title">Create Account</div>
+      <div class="page-subtitle">Student Event Registration System</div>
+    </div>
+
+    <!-- Name -->
+    <div class="field">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Your full name" autocomplete="name">
+      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+
+    <!-- Email -->
+    <div class="field">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="you@adbu.edu.in" autocomplete="email">
+      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/>
+      </svg>
+    </div>
+
+    <!-- Password -->
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="new-password">
+      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <button class="eye-toggle" onclick="togglePassword()" aria-label="Toggle password">
+        <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="error-msg" id="error">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="error-text"></span>
+    </div>
+
+    <div class="success-msg" id="success">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+      </svg>
+      <span id="success-text"></span>
+    </div>
+
+    <button class="btn-register" id="registerBtn" onclick="register()">
+      Create Account
+    </button>
+
+    <div class="footer-row">
+      <button class="btn-theme" onclick="toggleTheme()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span id="theme-label"></span>
+      </button>
+
+      <div class="login-link">Have an account? <a href="student_login.html">Login</a></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* Theme */
+  if(localStorage.getItem("theme") === "light") document.body.classList.add("light");
+
+  function updateThemeLabel(){
+    document.getElementById("theme-label").textContent =
+      document.body.classList.contains("light") ? "Dark" : "Light";
+  }
+
+  function toggleTheme(){
+    document.body.classList.toggle("light");
+    localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
+    updateThemeLabel();
+  }
+
+  updateThemeLabel();
+
+  /* Password toggle */
+  function togglePassword(){
+    const pw = document.getElementById("password");
+    const isText = pw.type === "text";
+    pw.type = isText ? "password" : "text";
+    document.getElementById("eye-icon").innerHTML = isText
+      ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+      : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  }
+
+  /* Register */
+  function register(){
+    const name     = document.getElementById("name").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const btn      = document.getElementById("registerBtn");
+
+    document.getElementById("error").classList.remove("visible");
+    document.getElementById("success").classList.remove("visible");
+
+    if(!name)     { showError("Please enter your full name.");     return; }
+    if(!email)    { showError("Please enter your email address."); return; }
+    if(!password) { showError("Please create a password.");        return; }
+    if(password.length < 6) { showError("Password must be at least 6 characters."); return; }
+
+    btn.classList.add("loading");
+    btn.textContent = "Creating Account…";
+
+    setTimeout(() => {
+      localStorage.setItem("regEmail", email);
+      localStorage.setItem("regPassword", password);
+      localStorage.setItem("regName", name);
+
+      btn.textContent = "✓ Account Created";
+      document.getElementById("success-text").textContent = "Registration successful! Redirecting…";
+      document.getElementById("success").classList.add("visible");
+
+      setTimeout(() => window.location.href = "student_login.html", 1200);
+    }, 900);
+  }
+
+  function showError(msg){
+    document.getElementById("error-text").textContent = msg;
+    document.getElementById("error").classList.add("visible");
+  }
+
+  document.addEventListener("keydown", e => { if(e.key === "Enter") register(); });
+</script>
+
+</body>
+</html>

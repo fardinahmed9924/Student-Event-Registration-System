@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Event Registration System - Register</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --sidebar-bg: #ffffff;
+    --header-bg: #1d6ff3;
+    --card: #ffffff;
+    --text: #1a1c2e;
+    --subtext: #6b7280;
+    --border: #e5e7eb;
+    --accent: #1d6ff3;
+    --accent-hover: #1558d6;
+    --sidebar-hover: #f0f4ff;
+    --sidebar-active: #e0eaff;
+    --sidebar-active-text: #1d6ff3;
+    --input-bg: #f9fafb;
+    --input-border: #d1d5db;
+    --input-focus: #1d6ff3;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --reset-btn: #6b7280;
+    --reset-hover: #4b5563;
+  }
+
+  body.dark {
+    --bg: #0e1117;
+    --sidebar-bg: #161b27;
+    --card: #1a2030;
+    --text: #e8eaf0;
+    --subtext: #8892a4;
+    --border: #2a3245;
+    --accent: #4d8ef8;
+    --accent-hover: #3a7ef0;
+    --sidebar-hover: #1f2a40;
+    --sidebar-active: #1e3660;
+    --sidebar-active-text: #60a5fa;
+    --input-bg: #1f2533;
+    --input-border: #2e3a50;
+    --input-focus: #60a5fa;
+    --shadow: 0 2px 16px rgba(0,0,0,0.35);
+    --reset-btn: #374151;
+    --reset-hover: #4b5563;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* FIXED HEADER */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    background: var(--header-bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+  }
+
+  header h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.01em;
+  }
+
+  .theme-toggle {
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    padding-top: 54px;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  aside {
+    width: 210px;
+    min-width: 210px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    padding: 16px 0 24px;
+    position: fixed;
+    top: 54px;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 90;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s;
+  }
+
+  aside.collapsed { transform: translateX(-210px); }
+
+  .nav-item {
+    display: block;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 1px 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-item:hover { background: var(--sidebar-hover); color: var(--accent); }
+  .nav-item.active { background: var(--sidebar-active); color: var(--sidebar-active-text); font-weight: 600; }
+
+  .nav-section {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--subtext);
+    padding: 12px 20px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .nav-section .arrow { font-size: 0.6rem; transition: transform 0.2s; }
+  .nav-section.open .arrow { transform: rotate(90deg); }
+
+  .nav-children { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; }
+  .nav-children.closed { max-height: 0; }
+
+  .nav-child {
+    display: block;
+    padding: 8px 20px 8px 32px;
+    font-size: 0.875rem;
+    color: var(--subtext);
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 1px 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-child:hover { background: var(--sidebar-hover); color: var(--accent); }
+  .nav-child.active { background: var(--sidebar-active); color: var(--sidebar-active-text); font-weight: 500; }
+
+  .nav-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+
+  /* MAIN */
+  main {
+    margin-left: 210px;
+    flex: 1;
+    padding: 32px 36px;
+    transition: margin-left 0.3s;
+  }
+
+  main.expanded { margin-left: 0; }
+
+  .page-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .page-subtitle {
+    font-size: 0.87rem;
+    color: var(--subtext);
+    margin-bottom: 24px;
+  }
+
+  /* FORM CARD */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 28px 30px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  fieldset {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px 24px;
+    transition: border-color 0.3s;
+  }
+
+  legend {
+    font-size: 0.73rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    padding: 0 8px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 28px;
+    margin-top: 10px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.77rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--subtext);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="file"],
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    color: var(--text);
+    border: 1.5px solid var(--input-border);
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(29,111,243,0.12);
+  }
+
+  input[type="file"] { padding: 7px 10px; cursor: pointer; }
+  select { cursor: pointer; }
+
+  .radio-group, .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 8px 0 2px;
+  }
+
+  .radio-label, .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-reset { background: var(--reset-btn); color: #fff; }
+  .btn-reset:hover { background: var(--reset-hover); }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 0.8rem;
+    color: var(--subtext);
+    border-top: 1px solid var(--border);
+    margin-top: 36px;
+    transition: border-color 0.3s;
+  }
+
+  @media (max-width: 700px) {
+    aside { transform: translateX(-210px); }
+    aside.mobile-open { transform: translateX(0); }
+    main { margin-left: 0; padding: 20px 16px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <h1>Student Event Registration System</h1>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+</header>
+
+<div class="layout">
+
+  <aside id="sidebar">
+    <div class="nav-item">Dashboard</div>
+    <div class="nav-divider"></div>
+
+    <div class="nav-section open" onclick="toggleSection(this)">Administration <span class="arrow">▶</span></div>
+    <div class="nav-children">
+      <div class="nav-child">Add Admin</div>
+      <div class="nav-child">Manage Admin</div>
+    </div>
+
+    <div class="nav-section open" onclick="toggleSection(this)">Students <span class="arrow">▶</span></div>
+    <div class="nav-children">
+      <div class="nav-child active">Add Student</div>
+      <div class="nav-child">View Students</div>
+    </div>
+
+    <div class="nav-section open" onclick="toggleSection(this)">Users <span class="arrow">▶</span></div>
+    <div class="nav-children">
+      <div class="nav-child">Add User</div>
+      <div class="nav-child">Manage Users</div>
+    </div>
+
+    <div class="nav-section open" onclick="toggleSection(this)">Events <span class="arrow">▶</span></div>
+    <div class="nav-children">
+      <div class="nav-child">Add Event</div>
+      <div class="nav-child">View Events</div>
+      <div class="nav-child">Registrations</div>
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-item" style="color:#ef4444;font-weight:600;">Logout</div>
+  </aside>
+
+  <main id="main">
+    <div class="page-title">Register</div>
+    <div class="page-subtitle">Fill in the details below to register a new student.</div>
+
+    <div class="card">
+      <fieldset>
+        <legend>Student Information</legend>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter your name here...">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter email address">
+          </div>
+
+          <div class="form-group full">
+            <label for="address">Address</label>
+            <input type="text" id="address" placeholder="Enter your address">
+          </div>
+
+          <div class="form-group">
+            <label>Gender</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="gender" value="Male"> Male</label>
+              <label class="radio-label"><input type="radio" name="gender" value="Female"> Female</label>
+              <label class="radio-label"><input type="radio" name="gender" value="Other"> Other</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country</label>
+            <select id="country">
+              <option value="">Please Select a Country</option>
+              <option>India</option>
+              <option>Singapore</option>
+              <option>China</option>
+              <option>United States</option>
+              <option>United Kingdom</option>
+              <option>Australia</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>City</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" value="Delhi"> Delhi</label>
+              <label class="checkbox-label"><input type="checkbox" value="Singapore"> Singapore</label>
+              <label class="checkbox-label"><input type="checkbox" value="Wuhan"> Wuhan (China)</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" placeholder="Enter age" min="1" max="120">
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+          </div>
+
+          <div class="form-group full">
+            <label for="image">Image</label>
+            <input type="file" id="image" accept="image/*">
+          </div>
+
+        </div>
+      </fieldset>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="registerStudent()">Register</button>
+        <button class="btn btn-reset" onclick="resetForm()">Reset</button>
+      </div>
+    </div>
+
+    <footer>© 2026 Student Event Registration System. All rights reserved.</footer>
+  </main>
+
+</div>
+
+<script>
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+
+  function toggleTheme() {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  }
+
+  let sidebarOpen = true;
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+    document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+    document.getElementById('main').classList.toggle('expanded', !sidebarOpen);
+  }
+
+  function toggleSection(el) {
+    el.classList.toggle('open');
+    const children = el.nextElementSibling;
+    if (children) children.classList.toggle('closed');
+  }
+
+  document.querySelectorAll('.nav-item, .nav-child').forEach(item => {
+    item.addEventListener('click', function () {
+      if (this.style.color === 'rgb(239, 68, 68)') return;
+      document.querySelectorAll('.nav-item, .nav-child').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  function registerStudent() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!name || !email) { alert('Please fill in at least Name and Email.'); return; }
+    alert('Student registered successfully!');
+  }
+
+  function resetForm() {
+    document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="file"]')
+      .forEach(i => i.value = '');
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+    document.getElementById('country').selectedIndex = 0;
+  }
+</script>
+</body>
+</html>
