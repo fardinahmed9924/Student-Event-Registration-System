@@ -16,7 +16,7 @@ A web-based system that allows students to register for events and helps adminis
 5. Run project
 
 ## 🎥 Demo Video
-https://youtube.com/your-video-link
+https://youtu.be/aBY55krvI7Q?si=k7uXiKuBv36Iu5sS
 
 ## 📊 Features
 - Event registration
